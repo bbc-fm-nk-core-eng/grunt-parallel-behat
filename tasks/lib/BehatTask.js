@@ -131,12 +131,16 @@ function BehatTask (options) {
                 // todo add config option
                 silentRequeue = true;
             }
-        }
-        else if (err.code === 1) {
+        } else if (err.code === 255) {
+            options.log('Curl Error 255: ' + task.descriptor + ' -  adding to the back of the queue.');
+            task.curlError();
+            if (task.curlErrors <= 5) {
+                silentRequeue = true;
+            }
+        } else if (err.code === 1) {
             options.log('Failed: ' + task.descriptor + ' - ' + output[output.length - 4] + ' in ' + output[output.length - 2]);
             task.failed(testResults);
-        }
-        else {
+        } else {
             options.log('Error: ' + task.descriptor + ' - ' + err + stdout);
             task.unknown();
         }
